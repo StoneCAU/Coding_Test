@@ -23,23 +23,26 @@ int main(void) {
 		int s;
 		cin >> s;
 
-		int max_meal = s / x;
-		int leftover = s % x;
-		int gap = max_meal*y - max_meal*x;
-		cnt += max_meal;
-
+		// x보다 작으면 버림
 		if (s < x) trash += s;
-		else if (gap < leftover)
+		else
 		{
-			int X = x;
+			int max_meal = s / x;
+			int leftover = s % x;
+			int gap = max_meal*y - max_meal*x;
 
-			while (max_meal == s / X && X <= y) X++;
+			if (gap < leftover)
+			{
+				int X = x;
 
-			trash += s % (X - 1);
+				while (max_meal == s / X && X <= y) X++;
+
+				trash += s % (X - 1);
+			}
+			
+
+			cnt += max_meal;
 		}
-			
-
-			
 	}
 
 
