@@ -17,38 +17,33 @@ int main(void) {
 	int trash = 0; // 샌드위치 조각이 최소가 되야함
 
 	cin >> n >> x >> y;
-
+	
 	for (int i = 0; i < n; i++)
 	{
 		int s;
 		cin >> s;
 
-		// x보다 작으면 버림
 		if (s < x) trash += s;
 		else
 		{
 			int max_meal = s / x;
 			int leftover = s % x;
-			int gap = max_meal*y - max_meal*x;
+			int t = y - x;
 
-			if (gap < leftover)
+			if (s >= x * max_meal && s <= y * max_meal) leftover = 0;
+			else
 			{
-				int X = x;
-
-				while (max_meal == s / X && X <= y) X++;
-
-				trash += s % (X - 1);
+				leftover = leftover - max_meal * t;
 			}
-			
 
 			cnt += max_meal;
+			trash += leftover;
 		}
 	}
 
-
+	
 	cout << cnt << "\n" << trash;
 
-	return 0;
 }
 
 
