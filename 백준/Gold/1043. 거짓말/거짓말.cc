@@ -8,8 +8,6 @@ int n, m;
 int know;
 int lie = 0;
 int arr[51]; // 파티 배열
-int visited[51];
-
 
 // 진실을 아는 사람
 queue<int> q;
@@ -61,12 +59,12 @@ int main(void) {
 	// 진실 퍼트리기
 	while (!q.empty())
 	{
+        // x: 진실을 알고 있는 사람 
 		int x = q.front();
-
-		//cout << "===== x = " << x << "=====\n";
-
+        
 		q.pop();
-
+        
+        // m개의 파티에서 x가 존재하는지 확인
 		for (int i = 0; i < m; i++)
 		{
 			bool flag = false;
@@ -74,34 +72,37 @@ int main(void) {
 			for (int j = 0; j < party[i].size(); j++)
 			{
 				int nx = party[i][j];
-
+                   
+                // 만약 진실인 사람이 파티의 집합에 존재한다면 flag는 true가 되고
 				if (x == nx) {
 					flag = true;
-					//cout << x << " " << nx << "\n";
 					break;
 				}
 			}
 
+            // 이미 진실을 말해야한다고 카운트되었으면 그 파티는 건너뜀
 			if (arr[i]) continue;
-
+            
+            // flag가 true라면 x가 포함된 파티에서 x제외 q에 push
 			if (flag) {
 				for (int j = 0; j < party[i].size(); j++)
 				{
 					int nx = party[i][j];
 
 					if (x != nx) {
-						//cout << "i= " << i << " push " << nx << "\n";
 						q.push(nx);
 						
 					}
 				}
 			}
 
+            // x가 존재하면 i번째 파티는 진실을 말해야함(1)
 			if(flag) arr[i] = 1;
 			
 		}
 	}
 
+    // 거짓을 말해도되는 파티의 수 계산(arr[i] = 0)
 	for (int i = 0; i < m; i++)
 		if (!arr[i]) lie++;
 
