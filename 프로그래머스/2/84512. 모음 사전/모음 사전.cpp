@@ -14,12 +14,12 @@ void dfs(string str, string word) {
         answer = cnt;
         return;
     }
-    
-    if(str.length()>=5) return;
-    
+        
     for (int i=0;i<5;i++) {
-        cnt++;
-        dfs(str+c[i], word);
+        if (str.length() < 5) {
+            cnt++;
+            dfs(str+c[i], word);
+        }
     }
 }
 
