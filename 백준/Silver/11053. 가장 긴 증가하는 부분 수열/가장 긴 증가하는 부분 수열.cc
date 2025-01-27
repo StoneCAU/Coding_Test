@@ -1,52 +1,32 @@
 #include <bits/stdc++.h>
-#include <algorithm>
-#include <unordered_map>
 
 using namespace std;
 
-
-
-int main(void) {
-
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-
+int main() {
+	
 	int n;
-	int dp[1002];
-	int res = 1;
-	vector<int> v;
-
 	cin >> n;
 
-	for (int i = 0; i < n; i++)
-	{
-		int num;
+	int dp[1001];
+	int arr[1001];
+	int M = 1;
 
-		cin >> num;
-
-		v.push_back(num);
+	for (int i = 1; i <= n; i++) {
+		cin >> arr[i];
 	}
 
-	dp[0] = 1;
+	for (int i = 1; i <= n; i++) {
+		dp[i] = 1;
 
-	for (int i = 1; i < n; i++) 
-	{
-		int M = 0;
-
-		for (int j = 0; j <= i; j++) 
-		{
-			if (v[i] > v[j])
-			{
-				if (M < dp[j]) M = dp[j];
+		for (int j = i - 1; j >= 1; j--) {
+			if (arr[i] > arr[j]) {
+				dp[i] = max(dp[i], dp[j] + 1);
 			}
 		}
-
-		if (!M) dp[i] = 1;
-		else dp[i] = M + 1;
-
-		if (res < dp[i]) res = dp[i];
+		
+		M = max(M, dp[i]);
 	}
+	
 
-	cout << res;
-
+	cout << M;
 }
