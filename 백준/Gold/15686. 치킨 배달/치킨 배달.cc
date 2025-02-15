@@ -1,106 +1,68 @@
 #include <bits/stdc++.h>
-#include <algorithm>
-#include <unordered_map>
+
 using namespace std;
 
 int n, m;
-int arr[52][52];
-int minimum = 1000000;
-
+int arr[51][51];
+vector<pair<int, int>> ch;
 vector<pair<int, int>> home;
-vector<pair<int, int>> chicken;
 
-int calculate(int hx, int hy, int cx, int cy)
-{
-	//cout << "집: " << hx << " " << hy << "\n";
-	//cout << "치킨: " << cx << " " << cy << "\n\n";
-	return abs(hx - cx) + abs(hy - cy);
-}
-
-int main(void) {
-
+int main() {
 	ios::sync_with_stdio(0);
 	cin.tie(0);
 
 	cin >> n >> m;
 
-	for (int i = 1; i <= n; i++)
-	{
-		for (int j = 1; j <= n; j++)
-		{
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
 			cin >> arr[i][j];
-
-			if (arr[i][j] == 1) home.push_back({ i, j });
-			if (arr[i][j] == 2) chicken.push_back({ i, j });
+			if (arr[i][j] == 1) home.push_back({ i,j });
+			if (arr[i][j] == 2) ch.push_back({ i,j });
 		}
 	}
 
-	// 조합 - m개의 치킨집 선택
-	
-	vector<int> v;
-
-	for (int i = 0; i < chicken.size(); i++)
-		v.push_back(i);
-
 	vector<int> temp;
+	vector<int> idx;
 
-	for (int i = 0; i < m; i++)
-		temp.push_back(1);
+	for (int i = 0; i < ch.size(); i++) {
+		if (i < m) temp.push_back(0);
+		else temp.push_back(1);
 
-	for (int i = 0; i < v.size() - m; i++)
-		temp.push_back(0);
+		idx.push_back(i);
+	}
 
-	sort(temp.begin(), temp.end());
+	int minD = 100000000;
 
-	int tot = 0;
-
-	// nCr번 반복
-	do
-	{
+	do {
+		// 치킨집 선택
 		vector<pair<int, int>> sel;
 
-		// m개 뽑기 반복
-		for (int i = 0; i < temp.size(); i++)
-		{
-			tot = 0; // 총 치킨 거리
+		for (int i = 0; i < temp.size(); i++) {
+			if (temp[i] == 0) {
+				int index = idx[i];
+				int x = ch[index].first;
+				int y = ch[index].second;
 
-			// 뽑은 m개 출력
-			if (temp[i] == 1)
-			{
-				//cout << "push: " << chicken[v[i]].first << " " << chicken[v[i]].second << "\n";
-				sel.push_back({ chicken[v[i]].first, chicken[v[i]].second });
-				
+				sel.push_back({ x, y });
 			}
 		}
+		
+		// 치킨 거리 계산
+		int chD = 0; // 총 치킨 거리
 
-		// 계산 끝, 다음 경우의 수 실행
+		for (int i = 0; i < home.size(); i++) {
+			int cal = 100000000;
 
-		//cout << "\n";
-
-
-		// v[i]: chicken index
-		for (int j = 0; j < home.size(); j++)
-		{
-			int minD = 1000000;
-
-			for (int k = 0; k < sel.size(); k++)
-			{
-				// 가구당 최소 치킨거리 계산
-				minD = min(minD, calculate(home[j].first, home[j].second, sel[k].first, sel[k].second));
-				//cout << j << "가구 최소거리 갱신: " << minD << "\n";
+			for (int j = 0; j < sel.size(); j++) {
+				cal = min(cal, abs(sel[j].first - home[i].first) + abs(sel[j].second - home[i].second));
 			}
 
-			tot += minD;
-			//cout << "tot: " << tot << "\n";
+			chD += cal;
 		}
 
-		minimum = min(minimum, tot);
-		//cout << "min: " << minimum << "\n";
-
-		sel.clear();
+		minD = min(minD, chD);
 
 	} while (next_permutation(temp.begin(), temp.end()));
 
-	cout << minimum;
-
+	cout << minD;
 }
