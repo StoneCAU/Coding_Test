@@ -14,129 +14,6 @@ bool attack[4][51][51]; // 상, 하, 좌, 우
 int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
 
-void initAttack() {
-    for (int i=0;i<4;i++) {
-        for (int j=0;j<n;j++) {
-            for (int k=0;k<n;k++) {
-                attack[i][j][k] = false;
-            }
-        }
-    }
-}
-
-void find(int ax, int ay) {
-    initAttack();
-
-    int tmp = 0;
-
-    // 상
-    for (int i=ax-1;i>=0;i--) {
-        int start = ay-(tmp+1); // 2
-        int end = ay+(tmp+1); // 3
-
-        // 범위 설정
-        if (start < 0) start = 0;
-        if (end > n-1) end = n-1;
-
-        for (int j=start;j<=end;j++) {
-            attack[0][i][j] = true;
-        }
-        tmp++;
-    }
-
-    tmp = 0;
-
-    // 하
-    for (int i=ax+1;i<n;i++) {
-        int start = ay-(tmp+1); // 
-        int end = ay+(tmp+1);
-
-        // 범위 설정
-        if (start < 0) start = 0;
-        if (end > n-1) end = n-1;
-
-        for (int j=start;j<=end;j++) {
-            attack[1][i][j] = true;
-        }
-        tmp++;
-    }
-
-    tmp = 0;
-
-    // 좌
-    for (int j=ay-1;j>=0;j--) {
-        int start = ax-(tmp+1);
-        int end = ax+(tmp+1);
-
-        // 범위 설정
-        if (start < 0) start = 0;
-        if (end > n-1) end = n-1;
-
-        for (int i=start;i<=end;i++) {
-            attack[2][i][j] = true;
-        }
-
-        tmp++;
-    }
-
-    tmp = 0;
-
-    // 우
-    for (int j=ay+1;j<n;j++) {
-        int start = ax-(tmp+1);
-        int end = ax+(tmp+1);
-
-        // 범위 설정
-        if (start < 0) start = 0;
-        if (end > n-1) end = n-1;
-        
-        for (int i=start;i<=end;i++) {
-            attack[3][i][j] = true;
-        }
-        tmp++;
-    }
-}
-
-int getMaxDirect() {
-    int res = 0;
-    int idx;
-
-    int u = 0, d = 0, l = 0, r = 0;  // 각 방향별 공격받는 전사의 수
-    vector<int> tmp;
-
-    // warriors 벡터를 순회
-    for (int a = 0; a < warriors.size(); a++) {
-        // 각 전사의 x, y 좌표 가져오기
-        auto& [x, y, status] = warriors[a];
-
-        // 죽은 전사(1)는 카운팅에서 제외
-        if (status == 1) continue; 
-
-        // 방향별 공격받는 전사 수 계산
-        for (int i = 0; i < 4; i++) {  // 4개의 방향에 대해 반복 (상, 하, 좌, 우)
-            if (attack[i][x][y] == 1) {  // 공격받는 경우
-                if (i == 0) u++;  // 상 방향
-                else if (i == 1) d++;  // 하 방향
-                else if (i == 2) l++;  // 좌 방향
-                else if (i == 3) r++;  // 우 방향
-            }
-        }
-    }
-
-    tmp.push_back(u); tmp.push_back(d);
-    tmp.push_back(l); tmp.push_back(r);
-
-    // 각 방향별 공격받은 전사 수 중 최대값 구하기
-    for (int i=0;i<4;i++) {
-        if (res < tmp[i]) {
-            res = tmp[i];
-            idx = i;
-        }
-    }
-
-    return idx;
-}
-
 void getSafeZone(int nx, int ny, int dir) {
     for (int i=0;i<warriors.size();i++) {
         auto [x, y, sts] = warriors[i];
@@ -279,6 +156,131 @@ void getSafeZone(int nx, int ny, int dir) {
             }
         }
     }
+}
+
+void initAttack() {
+    for (int i=0;i<4;i++) {
+        for (int j=0;j<n;j++) {
+            for (int k=0;k<n;k++) {
+                attack[i][j][k] = false;
+            }
+        }
+    }
+}
+
+void find(int ax, int ay) {
+    initAttack();
+
+    int tmp = 0;
+
+    // 상
+    for (int i=ax-1;i>=0;i--) {
+        int start = ay-(tmp+1); // 2
+        int end = ay+(tmp+1); // 3
+
+        // 범위 설정
+        if (start < 0) start = 0;
+        if (end > n-1) end = n-1;
+
+        for (int j=start;j<=end;j++) {
+            attack[0][i][j] = true;
+        }
+        tmp++;
+    }
+
+    tmp = 0;
+
+    // 하
+    for (int i=ax+1;i<n;i++) {
+        int start = ay-(tmp+1); // 
+        int end = ay+(tmp+1);
+
+        // 범위 설정
+        if (start < 0) start = 0;
+        if (end > n-1) end = n-1;
+
+        for (int j=start;j<=end;j++) {
+            attack[1][i][j] = true;
+        }
+        tmp++;
+    }
+
+    tmp = 0;
+
+    // 좌
+    for (int j=ay-1;j>=0;j--) {
+        int start = ax-(tmp+1);
+        int end = ax+(tmp+1);
+
+        // 범위 설정
+        if (start < 0) start = 0;
+        if (end > n-1) end = n-1;
+
+        for (int i=start;i<=end;i++) {
+            attack[2][i][j] = true;
+        }
+
+        tmp++;
+    }
+
+    tmp = 0;
+
+    // 우
+    for (int j=ay+1;j<n;j++) {
+        int start = ax-(tmp+1);
+        int end = ax+(tmp+1);
+
+        // 범위 설정
+        if (start < 0) start = 0;
+        if (end > n-1) end = n-1;
+        
+        for (int i=start;i<=end;i++) {
+            attack[3][i][j] = true;
+        }
+        tmp++;
+    }
+
+    for (int i=0;i<4;i++) getSafeZone(ax, ay, i);
+}
+
+int getMaxDirect() {
+    int res = 0;
+    int idx;
+
+    int u = 0, d = 0, l = 0, r = 0;  // 각 방향별 공격받는 전사의 수
+    vector<int> tmp;
+
+    // warriors 벡터를 순회
+    for (int a = 0; a < warriors.size(); a++) {
+        // 각 전사의 x, y 좌표 가져오기
+        auto& [x, y, status] = warriors[a];
+
+        // 죽은 전사(1)는 카운팅에서 제외
+        if (status == 1) continue; 
+
+        // 방향별 공격받는 전사 수 계산
+        for (int i = 0; i < 4; i++) {  // 4개의 방향에 대해 반복 (상, 하, 좌, 우)
+            if (attack[i][x][y] == 1) {  // 공격받는 경우
+                if (i == 0) u++;  // 상 방향
+                else if (i == 1) d++;  // 하 방향
+                else if (i == 2) l++;  // 좌 방향
+                else if (i == 3) r++;  // 우 방향
+            }
+        }
+    }
+
+    tmp.push_back(u); tmp.push_back(d);
+    tmp.push_back(l); tmp.push_back(r);
+
+    // 각 방향별 공격받은 전사 수 중 최대값 구하기
+    for (int i=0;i<4;i++) {
+        if (res < tmp[i]) {
+            res = tmp[i];
+            idx = i;
+        }
+    }
+
+    return idx;
 }
 
 int getStoneCount(int dir) {
@@ -501,32 +503,35 @@ void bfs() {
         // 메두사 현재 위치 기반 공격 범위 찾기
         find(nx, ny);
 
+        // // 전사들이 많은 방향 바라보기
+        // int nd = getMaxDirect();
+                
+        // // if (k > 2) {
+        //     cout << "\n";
+        //         for (int a=0;a<n;a++) {
+        //             for (int b=0;b<n;b++) {
+        //                 cout << attack[nd][a][b] << " ";
+        //             }
+        //             cout << "\n";
+        //         }
+        // //         }
+
+        // //         // 전사 위치에 따라 안전한 위치 구분하기
+        //          //getSafeZone(nx, ny, nd);
+
+        // //         if (k > 2) {
+        //             cout << nx << " " << ny << "\n";
+        //         cout << "\n";
+        //         for (int a=0;a<n;a++) {
+        //             for (int b=0;b<n;b++) {
+        //                 cout << attack[nd][a][b] << " ";
+        //             }
+        //             cout << "\n";
+        //         }
+        // //         }
+
         // 전사들이 많은 방향 바라보기
         int nd = getMaxDirect();
-                
-        // if (k > 2) {
-            // cout << "\n";
-            //     for (int a=0;a<n;a++) {
-            //         for (int b=0;b<n;b++) {
-            //             cout << attack[nd][a][b] << " ";
-            //         }
-            //         cout << "\n";
-            //     }
-        //         }
-
-        //         // 전사 위치에 따라 안전한 위치 구분하기
-                 getSafeZone(nx, ny, nd);
-
-        //         if (k > 2) {
-                //     cout << nx << " " << ny << "\n";
-                // cout << "\n";
-                // for (int a=0;a<n;a++) {
-                //     for (int b=0;b<n;b++) {
-                //         cout << attack[nd][a][b] << " ";
-                //     }
-                //     cout << "\n";
-                // }
-        //         }
 
 
                 // 돌로 변한 전사의 수 구하기
@@ -539,7 +544,7 @@ void bfs() {
                 // 죽은 전사 계산
                 int killed = kill(nx, ny);
 
-               // printDebugInfo(1, nx, ny, nd);
+                //printDebugInfo(1, nx, ny, nd);
 
                 initSts();
 
