@@ -329,6 +329,7 @@ int move(int mx, int my, int md) {
 
         // 첫 번째 이동: 상하좌우 우선순위
         int fx = x, fy = y;
+        int tx, ty;
         int minDist = getDistance(fx, fy, mx, my);
         bool firstMoved = false;
 
@@ -343,18 +344,24 @@ int move(int mx, int my, int md) {
 
             int ndist = getDistance(nx, ny, mx, my);
             if (ndist < minDist) {
-                fx = nx;
-                fy = ny;
+                tx = nx;
+                ty = ny;
                 minDist = ndist;
                 firstMoved = true;
-                //cout << i << " 첫 번째 이동: " << fx << " " << fy << "\n";
+                
             }
         }
 
+            fx = tx;
+            fy = ty;
+            //cout << i << " 첫 번째 이동: " << fx << " " << fy << "\n";
+
         // 첫 번째 이동 적용
         if (firstMoved) {
+            //cout << fx << " " << fy << " " << moved << " 1\n";
             moved++;
         }
+        else continue;
 
         // 두 번째 이동: 좌우상하 우선순위
         int secondDir[] = {2, 3, 0, 1}; // 좌우상하
@@ -363,37 +370,35 @@ int move(int mx, int my, int md) {
         for (int d = 0; d < 4; d++) {
             int nx = fx + dx[secondDir[d]];
             int ny = fy + dy[secondDir[d]];
-
                            // cout << dx[secondDir[d]] << " " << dy[secondDir[d]] <<"\n";
 
 
             if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-            if (arr[nx][ny] == 1) continue;
             if (attack[md][nx][ny]) continue;
 
             int ndist = getDistance(nx, ny, mx, my);
             if (ndist < minDist) {
                 //cout << fx << " " << fy <<"\n";
-                fx = nx;
-                fy = ny;
+                tx = nx;
+                ty = ny;
                 //cout << fx << " " << fy <<"\n";
                 minDist = ndist;
                 secondMoved = true;
             }
+
+             x = tx;
+             y = ty;
         }
 
         if (secondMoved) {
+            //cout << x << " " << y << " " << moved << "2\n";
             moved++;
         }
 
         // 최종 위치 반영
-        x = fx;
-        y = fy;
         //cout << i << " 두 번째 이동: " << x << " " << y << "\n\n";
 
     }
-
-
 
     return moved;
 }
@@ -545,7 +550,7 @@ void bfs() {
                 // 죽은 전사 계산
                 int killed = kill(nx, ny);
 
-               // if (k > 3) printDebugInfo(1, nx, ny, nd);
+               // printDebugInfo(1, nx, ny, nd);
 
                 initSts();
 
