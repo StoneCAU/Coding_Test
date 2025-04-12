@@ -586,6 +586,11 @@ int main() {
     //     cout << x << " " << y << "\n";
     // }
 
+    if (path.size() == 0) {
+        cout << -1;
+        return;
+    }
+
     if (path[path.size()-1].first != ex || path[path.size()-1].second != ey)
     {
         cout << -1;
