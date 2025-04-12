@@ -146,7 +146,7 @@ void getSafeZone(int nx, int ny, int dir) {
         if (!attack[dir][x][y]) continue;
 
         if (dir == 0) {
-            if (y >= ny - 1 && y <= ny + 1) {
+            if (y == ny) {
                     for (int j=x-1;j>=0;j--) {
                         attack[dir][j][y] = false;
                     } 
@@ -180,7 +180,7 @@ void getSafeZone(int nx, int ny, int dir) {
             }
         } 
         else if (dir == 1) {
-            if (y >= ny - 1 && y <= ny + 1) {
+            if (y == ny) {
                     for (int j=x+1;j<n;j++) {
                         attack[dir][j][y] = false;
                     } 
@@ -213,7 +213,7 @@ void getSafeZone(int nx, int ny, int dir) {
             }
         }
         else if (dir == 2) {
-            if (x >= nx - 1 && x <= nx + 1) {
+            if (x == nx) {
                     for (int j=y-1;j>=0;j--) {
                         attack[dir][x][j] = false;
                     } 
@@ -246,7 +246,7 @@ void getSafeZone(int nx, int ny, int dir) {
             }
         }
         else if (dir == 3) {
-            if (x >= nx - 1 && x <= nx + 1) {
+            if (x == nx) {
                     for (int j=y+1;j<n;j++) {
                         attack[dir][x][j] = false;
                     } 
@@ -325,9 +325,6 @@ int move(int mx, int my, int md) {
 
         if (status != 0) continue; // 돌로 변했거나 죽은 전사는 이동 X
 
-        //cout << i << " 원 위치: " << x << " " << y << "\n";
-
-        // 첫 번째 이동: 상하좌우 우선순위
         int fx = x, fy = y;
         int tx, ty;
         int minDist = getDistance(fx, fy, mx, my);
@@ -348,20 +345,17 @@ int move(int mx, int my, int md) {
                 ty = ny;
                 minDist = ndist;
                 firstMoved = true;
-                
             }
         }
 
-            fx = tx;
-            fy = ty;
-            //cout << i << " 첫 번째 이동: " << fx << " " << fy << "\n";
-
         // 첫 번째 이동 적용
         if (firstMoved) {
-            //cout << fx << " " << fy << " " << moved << " 1\n";
+            fx = tx;
+            fy = ty;
             moved++;
+        } else {
+            continue; // 첫 번째 이동 못했으면 두 번째 이동도 못함
         }
-        else continue;
 
         // 두 번째 이동: 좌우상하 우선순위
         int secondDir[] = {2, 3, 0, 1}; // 좌우상하
@@ -370,38 +364,33 @@ int move(int mx, int my, int md) {
         for (int d = 0; d < 4; d++) {
             int nx = fx + dx[secondDir[d]];
             int ny = fy + dy[secondDir[d]];
-                           // cout << dx[secondDir[d]] << " " << dy[secondDir[d]] <<"\n";
-
 
             if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
             if (attack[md][nx][ny]) continue;
 
             int ndist = getDistance(nx, ny, mx, my);
             if (ndist < minDist) {
-                //cout << fx << " " << fy <<"\n";
                 tx = nx;
                 ty = ny;
-                //cout << fx << " " << fy <<"\n";
                 minDist = ndist;
                 secondMoved = true;
             }
-
-             x = tx;
-             y = ty;
         }
 
+        // 두 번째 이동 적용
         if (secondMoved) {
-            //cout << x << " " << y << " " << moved << "2\n";
+            x = tx;
+            y = ty;
             moved++;
+        } else {
+            x = fx;
+            y = fy;
         }
-
-        // 최종 위치 반영
-        //cout << i << " 두 번째 이동: " << x << " " << y << "\n\n";
-
     }
 
     return moved;
 }
+
 
 
 void initSts() {
@@ -516,27 +505,27 @@ void bfs() {
         int nd = getMaxDirect();
                 
         // if (k > 2) {
-        //     cout << "\n";
-        //         for (int a=0;a<n;a++) {
-        //             for (int b=0;b<n;b++) {
-        //                 cout << attack[nd][a][b] << " ";
-        //             }
-        //             cout << "\n";
-        //         }
+            // cout << "\n";
+            //     for (int a=0;a<n;a++) {
+            //         for (int b=0;b<n;b++) {
+            //             cout << attack[nd][a][b] << " ";
+            //         }
+            //         cout << "\n";
+            //     }
         //         }
 
         //         // 전사 위치에 따라 안전한 위치 구분하기
                  getSafeZone(nx, ny, nd);
 
         //         if (k > 2) {
-        //             cout << nx << " " << ny << "\n";
-        //         cout << "\n";
-        //         for (int a=0;a<n;a++) {
-        //             for (int b=0;b<n;b++) {
-        //                 cout << attack[nd][a][b] << " ";
-        //             }
-        //             cout << "\n";
-        //         }
+                //     cout << nx << " " << ny << "\n";
+                // cout << "\n";
+                // for (int a=0;a<n;a++) {
+                //     for (int b=0;b<n;b++) {
+                //         cout << attack[nd][a][b] << " ";
+                //     }
+                //     cout << "\n";
+                // }
         //         }
 
 
