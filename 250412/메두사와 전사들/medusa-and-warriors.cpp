@@ -588,7 +588,7 @@ int main() {
 
     if (path.size() == 0) {
         cout << -1;
-        return;
+        return 0;
     }
 
     if (path[path.size()-1].first != ex || path[path.size()-1].second != ey)
