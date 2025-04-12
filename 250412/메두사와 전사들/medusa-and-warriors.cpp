@@ -348,8 +348,6 @@ int move(int mx, int my, int md) {
                 minDist = ndist;
                 firstMoved = true;
                 //cout << i << " 첫 번째 이동: " << fx << " " << fy << "\n";
-
-                break; // 우선순위에 따라 가장 먼저 되는 방향으로 이동
             }
         }
 
@@ -366,17 +364,21 @@ int move(int mx, int my, int md) {
             int nx = fx + dx[secondDir[d]];
             int ny = fy + dy[secondDir[d]];
 
+                           // cout << dx[secondDir[d]] << " " << dy[secondDir[d]] <<"\n";
+
+
             if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
             if (arr[nx][ny] == 1) continue;
             if (attack[md][nx][ny]) continue;
 
             int ndist = getDistance(nx, ny, mx, my);
             if (ndist < minDist) {
+                //cout << fx << " " << fy <<"\n";
                 fx = nx;
                 fy = ny;
+                //cout << fx << " " << fy <<"\n";
                 minDist = ndist;
                 secondMoved = true;
-                break; // 우선순위 적용
             }
         }
 
@@ -543,7 +545,7 @@ void bfs() {
                 // 죽은 전사 계산
                 int killed = kill(nx, ny);
 
-                //if (k > 2) printDebugInfo(1, nx, ny, nd);
+               // if (k > 3) printDebugInfo(1, nx, ny, nd);
 
                 initSts();
 
