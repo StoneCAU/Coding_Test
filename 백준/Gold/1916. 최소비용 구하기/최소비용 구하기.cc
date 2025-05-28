@@ -1,72 +1,49 @@
 #include <bits/stdc++.h>
-#include <algorithm>
-#include <unordered_map>
-
 using namespace std;
 
-#define INF 999999999
+int main() {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
 
-int n, m;
-int start, dest;
-int dist[1001];
+    int n,m;
+    cin >> n >> m;
 
-vector<vector<pair<int,int>>> node(1001);
+    vector<pair<int,int>> v[n+1];
 
-int dijkstra(int start, int dest)
-{
-	priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
-	
-	dist[start] = 0;
+    for (int i=0;i<m;i++) {
+        int s,e,w;
+        cin >> s >> e >> w;
 
-	pq.push({ 0, start });
+        v[s].push_back({e, w}); // (도착점, 가중치)
+    }
 
-	while (!pq.empty())
-	{
-		int cur_dist = pq.top().first;
-		int cur_node = pq.top().second;
+    int ts, te;
+    cin >> ts >> te;
 
-		pq.pop();
+    vector<int> dist(n+1, 1000000000);
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
 
-		if (cur_dist > dist[cur_node]) continue;
-		for (int i = 0; i < node[cur_node].size(); i++)
-		{
-			int nxt_node = node[cur_node][i].first;
-			int nxt_dist = node[cur_node][i].second + cur_dist;
+    pq.push({0, ts});
+    dist[ts] = 0;
 
-			if (dist[nxt_node] > nxt_dist)
-			{
-				dist[nxt_node] = nxt_dist;
-				pq.push({ nxt_dist, nxt_node });
-			}
-		}
-	}
+    while (!pq.empty()) {
+        int curDist = pq.top().first;
+        int curNode = pq.top().second;
 
-	return dist[dest];
+        pq.pop();
+
+        if (curDist > dist[curNode]) continue;
+
+        for (auto edge : v[curNode]) {
+            int nextNode = edge.first;
+            int weight = edge.second;
+
+            if (dist[curNode] + weight < dist[nextNode]) {
+                dist[nextNode] = dist[curNode] + weight;
+                pq.push({dist[nextNode], nextNode});
+            }
+        }
+    }
+
+    cout << dist[te];
 }
-
-int main(void) {
-
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
-
-	cin >> n >> m;
-
-	for (int i = 0; i < m; i++)
-	{
-		int a, b, c;
-
-		cin >> a >> b >> c;
-
-		node[a].push_back({ b,c });
-		// node[b].push_back({ a,c });
-	}
-
-	fill(&dist[0], &dist[0] + 1001, INF);
-
-	cin >> start >> dest;
-
-	cout << dijkstra(start, dest);
-}
-
-
