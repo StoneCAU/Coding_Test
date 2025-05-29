@@ -1,90 +1,67 @@
 #include <bits/stdc++.h>
-#include <algorithm>
-#include <unordered_map>
-
 using namespace std;
 
-#define INF 10001
+const long long INF = 1e9 + 7;
 
-int tc, n, m, w;
-int s, e, t;
-int dist[501];
+int main() {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
 
-bool bf(vector<pair<pair<int, int>, int>> node)
-{
-	fill(&dist[0], &dist[0] + 501, INF);
+    int T;
+    cin >> T;
 
-	// n-1번 반복
-	for (int i = 0; i < n - 1; i++)
-	{
-		for (int j = 0; j < node.size(); j++)
-		{
-			int from = node[j].first.first;
-			int to = node[j].first.second;
-			int time = node[j].second;
+    while (T--) {
+        int n, m, w;
+        cin >> n >> m >> w;
 
-			if (dist[from] == INF) dist[from] = 0;
+        vector<tuple<int, int, int>> edges;
 
-			if (dist[to] > dist[from] + time)
-			{
-				dist[to] = dist[from] + time;
-			}
-		}
-	}
+        for (int i = 0; i < m; i++) {
+            int s, e, t;
+            cin >> s >> e >> t;
+            edges.push_back({s, e, t});
+            edges.push_back({e, s, t});
+        }
 
-	for (int j = 0; j < node.size(); j++)
-	{
-		int from = node[j].first.first;
-		int to = node[j].first.second;
-		int time = node[j].second;
+        for (int i = 0; i < w; i++) {
+            int s, e, t;
+            cin >> s >> e >> t;
+            edges.push_back({s, e, -t});
+        }
 
-		if (dist[to] > dist[from] + time)
-		{
-			dist[to] = dist[from] + time;
-			return true;
-		}
-	}
+        vector<long long> dist(n + 1, 0); 
+        
+        bool hasNegative = false;
 
-	return false;
+        for (int i = 1; i <= n - 1; ++i) { 
+            bool update = false; 
 
+            for (auto edge : edges) { 
+                auto [u, v, cost] = edge;
+
+                if (dist[u] + cost < dist[v]) {
+                    dist[v] = dist[u] + cost;
+                    update = true;
+                }
+            }
+            if (!update) break; 
+        }
+
+        for (auto edge : edges) { 
+            auto [u, v, cost] = edge;
+
+            if (dist[u] + cost < dist[v]) {
+                hasNegative = true;
+                break; 
+            }
+        }
+
+        if (hasNegative) {
+            cout << "YES\n";
+        } else {
+            cout << "NO\n";
+        }
+    }
+
+    return 0;
 }
-
-
-int main(void) {
-
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
-
-	cin >> tc;
-
-	for (int i = 0; i < tc; i++)
-	{
-		vector<pair<pair<int, int>, int>> node(501);
-
-		cin >> n >> m >> w;
-
-		// 도로의 정보
-		for (int j = 0; j < m; j++)
-		{
-			cin >> s >> e >> t;
-			node.push_back({ { s, e }, t });
-			node.push_back({ { e, s }, t });
-		}
-
-		// 웜홀의 정보
-		for (int j = 0; j < w; j++)
-		{
-			cin >> s >> e >> t;
-			node.push_back({ { s, e }, -t });
-		}
-
-		if (bf(node)) cout << "YES\n";
-		else cout << "NO\n";
-
-	}
-	
-
-}
-
-
