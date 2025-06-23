@@ -4,139 +4,34 @@ import java.util.*;
 public class Main {
     static int n,m,d;
     static int[][] arr;
+    static int[][] arrCopy;
 
-    static class Pair implements Comparable<Pair> {
-        int x, y;
+    // 1. 가장 가까운 적(가장 마지막 행부터 검사)
+    // 2. 가장 왼쪽에 있는 적(index 0부터 검사)
+    static int[] findEnemy(int idx) {
+        int minDist = 100000000;
+        int t = m;
+        int[] target = new int[]{-1};
 
-        Pair(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
+        for (int i=n-1;i>=0;i--) {
+            for (int j=0;j<m;j++) {
+                int dist = calDistance(i, j, n, idx);
+                if (dist > d) continue;
 
-        @Override
-        public int compareTo(Pair o) {
-            int cmp = Integer.compare(this.x, o.x);
-            if (cmp == 0) {
-                return Integer.compare(this.y, o.y);
+                if (arrCopy[i][j] == 1 && minDist >= dist) {
+                    if (minDist == dist && j >= t) continue;
+
+                    minDist = dist;
+                    target = new int[]{i, j};
+                    t = j;
+                }
             }
-            return cmp;
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-            Pair pair = (Pair) obj;
-            return x == pair.x && y == pair.y;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y);
-        }
-    }
-
-    static class Atk implements Comparable<Atk> {
-        Pair pair;
-        int dist;
-
-        Atk(Pair pair, int dist) {
-            this.pair = pair;
-            this.dist = dist;
-        }
-
-        @Override
-        public int compareTo(Atk o) {
-            int cmp = Integer.compare(this.dist, o.dist);
-            if (cmp == 0) {
-                cmp = Integer.compare(this.pair.y, o.pair.y);
-            }
-
-            return cmp;
-        }
-    }
-
-    static List<List<Integer>> genCombinations() {
-        List<List<Integer>> res = new ArrayList<>();
-        List<Integer> cur = new ArrayList<>();
-        backtrack(0,3, cur, res);
-        return res;
-    }
-
-    static void backtrack(int start, int remain, List<Integer> cur, List<List<Integer>> res) {
-        // 3명 위치 선정 완료
-        if (remain == 0) {
-            res.add(new ArrayList<>(cur));
-            return;
-        }
-
-        // 가지치기
-        if (start > m || (m - start + 1) < remain) return;
-
-        for (int i=start;i<=m;i++) {
-            cur.add(i);
-            backtrack(i+1, remain-1, cur, res);
-            cur.remove(cur.size() - 1);
-        }
+        return target;
     }
 
     static int calDistance(int r1, int c1, int r2, int c2) {
         return Math.abs(r1-r2) + Math.abs(c1-c2);
-    }
-
-    static int play(List<Integer> comb) {
-        // 배열 복사
-        int[][] temp = new int[n+1][m+1];
-        for (int i=0;i<n;i++) {
-            temp[i] = arr[i].clone();
-        }
-
-        int kill = 0;
-
-        // n 라운드 진행
-        for (int i=1;i<=n;i++) {
-            HashSet<Pair> set = new HashSet<>();
-
-            // 궁수 한 명 당 공격할 수 있는 적 선택
-            for (int a : comb) {
-                int x = n;
-                int y = a;
-
-                List<Atk> attacks = new ArrayList<>();
-
-                for (int j=0;j<n;j++) {
-                    for (int k=0;k<m;k++) {
-                        int dist = calDistance(x,y,j,k);
-                        if (temp[j][k] == 1 && dist <= d) {
-                            attacks.add(new Atk(new Pair(j,k), dist));
-                        }
-                    }
-                }
-
-                if (attacks.isEmpty()) continue;
-
-                Collections.sort(attacks);
-
-                Atk atk = attacks.get(0);
-                set.add(new Pair(atk.pair.x, atk.pair.y));
-            }
-
-            for (Pair atk : set) {
-                temp[atk.x][atk.y] = 0;
-                kill++;
-            }
-
-            // 적 이동
-            for (int j=n-2;j>=0;j--) {
-                temp[j+1] = temp[j].clone();
-            }
-
-            for (int j=0;j<m;j++) {
-                temp[0][j] = 0;
-            }
-        }
-
-        return kill;
     }
 
     public static void main(String[] args) throws IOException {
@@ -149,7 +44,7 @@ public class Main {
 
         arr = new int[n+1][m+1];
 
-        // 초기 맵
+        // 맵 초기화
         for (int i=0;i<n;i++) {
             st = new StringTokenizer(br.readLine());
             for (int j=0;j<m;j++) {
@@ -157,15 +52,65 @@ public class Main {
             }
         }
 
-        // mC3
-        List<List<Integer>> res = genCombinations();
-        int maxKill = 0;
-
-        for (List<Integer> comb : res) {
-
-            maxKill = Math.max(maxKill, play(comb));
+        // 궁수 위치 경우의 수 뽑기
+        List<int[]> archers = new ArrayList<>();
+        for (int i=0;i<m;i++) {
+            for (int j=i+1;j<m;j++) {
+                for (int k=j+1;k<m;k++) {
+                    int[] idx = new int[]{i, j, k};
+                    archers.add(idx);
+                }
+            }
         }
 
-        System.out.println(maxKill);
+        // 최댓값 계산
+        int maxKills = 0;
+
+        // 모든 경우의 수 돌기
+        for (int[] archer : archers) {
+            // 해당 경우의 수에서 죽일 수 있는 적의 수
+            int totalKills = 0;
+
+            // 맵 copy
+            arrCopy = new int[n+1][m+1];
+            for (int i=0;i<n;i++) {
+                arrCopy[i] = arr[i].clone();
+            }
+
+            // 라운드 돌기
+            for (int i=0;i<n;i++) {
+                // 적 좌표 저장할 HashSet
+                HashSet<String> hs = new HashSet<>();
+
+                // 공격할 적 정하기
+                for (int idx : archer) {
+                    int[] enemy = findEnemy(idx);
+
+                    if (enemy[0] == -1) continue;
+                    hs.add(enemy[0] + "," + enemy[1]);
+                }
+
+                // 적 제거하기
+                for (String enemy : hs) {
+                    String[] pos = enemy.split(",");
+                    int x = Integer.parseInt(pos[0]);
+                    int y = Integer.parseInt(pos[1]);
+                    arrCopy[x][y] = 0;
+                    totalKills++;
+                }
+
+                // 적 이동
+                for (int j = n-2;j>=0;j--) {
+                    arrCopy[j+1] = arrCopy[j].clone();
+                }
+
+                // 맨 첫 줄은 0으로 초기화
+                Arrays.fill(arrCopy[0], 0);
+            }
+
+            maxKills = Math.max(maxKills, totalKills);
+        }
+
+        System.out.println(maxKills);
     }
 }
