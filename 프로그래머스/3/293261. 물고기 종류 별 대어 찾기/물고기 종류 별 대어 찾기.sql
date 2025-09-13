@@ -5,4 +5,4 @@ where a.fish_type in (select fish_type
                      from fish_info
                      group by fish_type
                      having length = max(length))
-order by id 
+order by a.id
