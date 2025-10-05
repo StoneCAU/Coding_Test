@@ -1,42 +1,50 @@
 #include<bits/stdc++.h>
-#include<unordered_map>
 
 using namespace std;
 
-bool comp(pair<int,int>& a, pair<int,int>& b) {
-    return a.second > b.second;
+bool cmp(vector<int>& a, vector<int>& b) {
+    return a.size() < b.size();
 }
 
 vector<int> solution(string s) {
-    unordered_map<int, int> m;
+    vector<int> answer;
+    vector<vector<int>> tot;
     
-    for(int i=0;i<s.length();i++) {
-        char cur = s[i];
+    // 맨 앞, 뒤 대괄호 제거
+    s = s.substr(1, s.length()-1);
+    s = s.substr(0, s.length()-1);
+    
+    while(1) {
+        if (s[0] == ',') s = s.substr(1, s.length()-1);
+        int eIdx = s.find("}");
         
-        if (cur >= '0' && cur <= '9') {
-            string num = "";
-            num += cur;
-            
-            int idx = i;
-            
-            while(1) {
-                idx++;
-                if (s[idx] < '0' || s[idx] > '9') break;
-                num += s[idx];
+        vector<int> temp;
+        string num = "";
+        for (int i=1;i<=eIdx;++i) {
+            if (s[i] == ',' || s[i] == '}') {
+                temp.push_back(stoi(num));
+                num = "";
             }
-            
-            i = idx - 1;
-            m[stoi(num)]++;
+            else {
+                num += s[i];
+            }
         }
+        
+        tot.push_back(temp);
+        if (eIdx == s.length()-1) break;
+        s = s.substr(eIdx+1, s.length()-eIdx);
     }
     
-    vector<pair<int,int>> v(m.begin(), m.end());
-    sort(v.begin(), v.end(), comp);
-    
-    vector<int> answer;
-    
-    for (int i=0;i<v.size();i++) {
-        answer.push_back(v[i].first);
+    sort(tot.begin(), tot.end(), cmp);
+    set<int> set;
+    for (int i=0;i<tot.size();++i) {
+        for (int j=0;j<tot[i].size();++j) {
+            if (set.find(tot[i][j]) == set.end()) {
+                set.insert(tot[i][j]);
+                answer.push_back(tot[i][j]);
+                break;
+            }
+        }
     }
     
     return answer;
