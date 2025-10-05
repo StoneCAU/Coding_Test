@@ -1,49 +1,33 @@
-#include<bits/stdc++.h>
-#include<unordered_map>
-
+#include <bits/stdc++.h>
 using namespace std;
 
 int solution(int cacheSize, vector<string> cities) {
-    int answer = 0;
-    
-    deque<string> dq;
-    
-    for (int i=0;i<cities.size();i++) {
-        string cur = cities[i];
-        bool cache = false;
-        int index = -1;
-        
-        for (int j=0;j<cur.size();j++) {
-            if (cur[j] >= 'A' && cur[j] <= 'Z') {
-                cur[j] = tolower(cur[j]);
-            }
-        }
-        
-        for (int j=0;j<dq.size();j++) {
-            if (dq[j] == cur) {
-                cache = true;
-                index = j;
-                break;
-            }
-        }
-        
-        if (cache) {
-            answer++;
-            string hit = dq[index];
-            dq.erase(dq.begin() + index);
-            dq.push_back(hit);
-        }
-        else {
-            answer += 5;
-            
-            dq.push_back(cur);
+    if (cacheSize == 0) return 5 * cities.size();
 
-            if (dq.size() > cacheSize) {
-                dq.pop_front();
+    int answer = 0;
+    list<string> cache;
+    unordered_set<string> cacheSet;
+
+    for (auto city : cities) {
+        for (auto &c : city) c = tolower(c);
+
+        // cache hit
+        if (cacheSet.count(city)) {
+            cache.remove(city);
+            cache.push_back(city);
+            answer += 1;
+        } 
+        // cache miss
+        else {
+            if (cache.size() == cacheSize) {
+                cacheSet.erase(cache.front());
+                cache.pop_front();
             }
+            cache.push_back(city);
+            cacheSet.insert(city);
+            answer += 5;
         }
-        
     }
-    
+
     return answer;
 }
